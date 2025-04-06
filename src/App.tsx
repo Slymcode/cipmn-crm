@@ -30,7 +30,7 @@ function App() {
         <AntdApp>
           <Refine
             Title={({ collapsed }) => (
-              <ThemedTitleV2 collapsed={collapsed} text="MyApp" />
+              <ThemedTitleV2 collapsed={collapsed} text="CIPMN" />
             )}
             dataProvider={customDataProvider}
             notificationProvider={useNotificationProvider}
