@@ -18,7 +18,8 @@ export const Login: React.FC = () => {
   useDocumentTitle("Login | CIPMN CRM");
 
   const onFinish = (values: LoginForm) => {
-    login(values);
+    const e = login(values);
+    console.log(e);
   };
 
   useEffect(() => {
@@ -73,7 +74,7 @@ export const Login: React.FC = () => {
           />
         </Form.Item>
 
-        {/* Forgot Password */}
+        {/* Forgot Password 
         <div className="text-xs font-medium text-right text-[#1F5E29] mb-6 cursor-pointer hover:underline">
           <Link
             to="/forgot-password"
@@ -83,7 +84,7 @@ export const Login: React.FC = () => {
             Forgot password?
           </Link>
         </div>
-
+*/}
         {/* Sign In Button */}
         <Button
           type="primary"
