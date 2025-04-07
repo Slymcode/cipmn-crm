@@ -10,7 +10,8 @@ import routerBindings, {
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
 import { App as AntdApp, Layout } from "antd";
-import { BrowserRouter, Outlet, Route, Routes } from "react-router";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+
 import { customDataProvider } from "./providers/customDataProvider";
 import { authProvider } from "./providers/auth";
 
