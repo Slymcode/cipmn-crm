@@ -1521,11 +1521,10 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
               // rules={[{ required: true, message: "Please enter Country" }]}
             >
               <Select
-                options={nigeriaStates.map((state) => ({
-                  value: state,
-                  label: state,
+                options={countryList.map((country) => ({
+                  value: country,
+                  label: country,
                 }))}
-                onChange={handleStateChange}
                 className="w-full"
                 style={inputStyle}
               />
@@ -1585,11 +1584,10 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
               //rules={[{ required: true, message: "Please enter Country" }]}
             >
               <Select
-                options={nigeriaStates.map((state) => ({
-                  value: state,
-                  label: state,
+                options={countryList.map((country) => ({
+                  value: country,
+                  label: country,
                 }))}
-                onChange={handleStateChange}
                 className="w-full"
                 style={inputStyle}
               />
@@ -1658,11 +1656,10 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
               //rules={[{ required: true, message: "Please enter Country" }]}
             >
               <Select
-                options={nigeriaStates.map((state) => ({
-                  value: state,
-                  label: state,
+                options={countryList.map((country) => ({
+                  value: country,
+                  label: country,
                 }))}
-                onChange={handleStateChange}
                 className="w-full"
                 style={inputStyle}
               />
