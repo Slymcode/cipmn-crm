@@ -211,7 +211,18 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
     "Honorary Fellowship",
   ];
 
-  const titles = ["Engr", "Arc", "Bldr", "Qs", "Dr", "Mr", "Ms", "Mrs"];
+  const titles = [
+    "Engr",
+    "Arc",
+    "Bldr",
+    "Qs",
+    "Dr",
+    "Prof",
+    "Barr",
+    "Mr",
+    "Ms",
+    "Mrs",
+  ];
   const maritalStatuses = ["Single", "Married", "Divorced", "Widowed"];
   const nigeriaZones = [
     "North Central",
