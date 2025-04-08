@@ -18,8 +18,7 @@ export const Login: React.FC = () => {
   useDocumentTitle("Login | CIPMN CRM");
 
   const onFinish = (values: LoginForm) => {
-    const e = login(values);
-    console.log(e);
+    login(values);
   };
 
   useEffect(() => {

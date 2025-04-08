@@ -1,6 +1,7 @@
 import React from "react";
 import { Form, Input, Button } from "antd";
-import { useRegister } from "@refinedev/core";
+import { useRegister, useNotification } from "@refinedev/core";
+
 import { Link } from "react-router-dom";
 import { useDocumentTitle } from "@refinedev/react-router";
 
@@ -8,12 +9,14 @@ interface RegisterForm {
   name: string;
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
 export const Register: React.FC = () => {
   const { mutate: register } = useRegister();
   useDocumentTitle("Register | CIPMN CRM");
-  const onFinish = (values: RegisterForm) => {
+  const { open: notify } = useNotification();
+  const onFinish = async (values: RegisterForm) => {
     register(values);
   };
 

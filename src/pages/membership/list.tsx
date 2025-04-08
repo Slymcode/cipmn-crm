@@ -33,16 +33,17 @@ export const List = () => {
   const navigate = useNavigate(); // For redirecting
   useDocumentTitle("Membership | CIPMN CRM");
 
-  // 🟢 Fetch Membership Records on Page Load
+  // Fetch Membership Records on Page Load
   useEffect(() => {
     const fetchMemberships = async () => {
       setLoading(true);
       try {
-        const response = await customDataProvider.getList({
+        const { data }: any = await customDataProvider.getList({
           resource: "membership",
           // pagination: { page: 1, perPage: 50 }, // Adjust pagination as needed
         });
-        const formattedData = response.data.map((item: any) => ({
+
+        const formattedData = data.data.map((item: any) => ({
           key: item.id, // Unique key
           id: item.id,
           userId: item.userId,

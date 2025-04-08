@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+
 import {
   Form,
   Input,
@@ -27,6 +28,7 @@ import { useForm as useRefineForm } from "@refinedev/antd";
 import { customDataProvider } from "../../providers/customDataProvider";
 import { useNavigate, useParams } from "react-router-dom"; // Import useNavigate for redirection
 import { useDocumentTitle } from "@refinedev/react-router";
+import { useNotification } from "@refinedev/core";
 
 // Utility for combining class names
 const cn = (...classes: string[]): string => classes.filter(Boolean).join(" ");
@@ -57,69 +59,69 @@ export const EditMembership: React.FC<StepFormProps> = () => {
   const [formData, setFormData] = useState<any>();
   const [form] = Form.useForm();
   useDocumentTitle("Edit | CIPMN CRM");
+  const { open: notify } = useNotification();
 
   const [data, setData] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
-
+  const hasFetched = useRef(false);
   useEffect(() => {
     const fetchMembership = async () => {
-      if (!membershipId) return; // Ensure there's an ID to fetch
+      if (!membershipId || hasFetched.current) return;
+      hasFetched.current = true;
 
       setLoading(true);
       try {
-        const response: any = await customDataProvider.getOne({
+        const { data }: any = await customDataProvider.getOne({
           resource: "membership",
-          id: membershipId, // Fetch specific record by ID
+          id: membershipId,
         });
-
+        const response = data.data;
         if (response) {
           setFormData((prev: any) => ({
             ...prev,
             ...response,
-
-            // Convert date fields to dayjs
             dob: response.dob ? dayjs(response.dob) : "",
             yearOfLicense: response.yearOfLicense
               ? dayjs(response.yearOfLicense)
               : "",
-
-            // Parse JSON fields
             countryOfOrigin: JSON.parse(response.countryOfOrigin || "{}"),
             countryOfResidence: JSON.parse(response.countryOfResidence || "{}"),
             countryOfOperation: JSON.parse(response.countryOfOperation || "{}"),
-
             educationQualification: {
               degrees: JSON.parse(
                 response.educationQualification || '{"degrees":[]}'
               ).degrees.map((degree: any) => ({
                 ...degree,
-                year: degree.year ? dayjs(degree.year) : "", // Convert year to dayjs
+                year: degree.year ? dayjs(degree.year) : "",
               })),
             },
-
             professionalQualification: JSON.parse(
               response.professionalQualification || "[]"
             ),
-
             workExperience: JSON.parse(response.workExperience || "[]").map(
               (exp: any) => ({
                 ...exp,
-                year: exp.year ? dayjs(exp.year) : "", // Convert workExperience.year to dayjs
+                year: exp.year ? dayjs(exp.year) : "",
               })
             ),
-
             references: JSON.parse(response.references || "[]"),
           }));
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching membership data:", error);
+        navigate("/membership");
+        notify?.({
+          type: "error",
+          message: error?.message,
+          description: error?.error || "Something went wrong.",
+        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchMembership();
-  }, [membershipId]); // Re-fetch when the ID changes
+  }, [membershipId]);
 
   const handleNext = async () => {
     const values = await form.validateFields();
@@ -1418,16 +1420,6 @@ export const EditMembership: React.FC<StepFormProps> = () => {
               border: "0",
             }}
           >
-            <Form.Item
-              name="email"
-              label="Email"
-              rules={[
-                { required: true, message: "Please enter email" },
-                { type: "email", message: "Invalid email" },
-              ]}
-            >
-              <Input type="email" style={inputStyle} />
-            </Form.Item>
             <Form.Item
               name="phone"
               label="Phone"

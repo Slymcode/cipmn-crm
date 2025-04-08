@@ -18,17 +18,20 @@ export const authProvider: AuthProvider = {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Login failed");
+        return Promise.reject({
+          success: false,
+          error: new Error("Login failed"),
+        });
       }
 
-      const data = await response.json();
+      const { data } = await response.json();
       localStorage.setItem("access_token", data.accessToken);
       return { success: true, redirectTo: "/" };
     } catch (error: any) {
-      return {
+      return Promise.reject({
         success: false,
         error: new Error(error?.message || "Login failed"),
-      };
+      });
     }
   },
 
@@ -49,25 +52,32 @@ export const authProvider: AuthProvider = {
     return { error };
   },
 
-  register: async ({ name, email, password }): Promise<AuthActionResponse> => {
+  register: async ({
+    name,
+    email,
+    password,
+    confirmPassword,
+  }): Promise<AuthActionResponse> => {
     try {
       const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, confirmPassword }),
       });
-
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Registration failed");
+        return Promise.reject({
+          success: false,
+          error: new Error(errorData.message || "Registration failed"),
+        });
       }
 
       return { success: true, redirectTo: "/login" };
     } catch (error: any) {
-      return {
+      return Promise.reject({
         success: false,
         error: new Error(error?.message || "Registration failed"),
-      };
+      });
     }
   },
 
@@ -81,15 +91,18 @@ export const authProvider: AuthProvider = {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Forgot password failed");
+        return Promise.reject({
+          success: false,
+          error: new Error(errorData.message || "Forgot password failed"),
+        });
       }
 
       return { success: true };
     } catch (error: any) {
-      return {
+      return Promise.reject({
         success: false,
         error: new Error(error?.message || "Forgot password failed"),
-      };
+      });
     }
   },
 
@@ -106,15 +119,18 @@ export const authProvider: AuthProvider = {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Update password failed");
+        return Promise.reject({
+          success: false,
+          error: new Error(errorData.message || "Update password failed"),
+        });
       }
 
       return { success: true, redirectTo: "/login" };
     } catch (error: any) {
-      return {
+      return Promise.reject({
         success: false,
         error: new Error(error?.message || "Update password failed"),
-      };
+      });
     }
   },
 

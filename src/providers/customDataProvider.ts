@@ -47,9 +47,10 @@ const getAPIResponseErrors = (
 const fetchWrapper = async (
   url: string,
   options: RequestInit
-): Promise<Response> => {
+): Promise<{ success: boolean; data?: any; error?: ResponseError }> => {
   const accessToken = getAccessToken();
   const headers = options.headers as Record<string, string>;
+
   const response = await fetch(url, {
     ...options,
     headers: {
@@ -59,24 +60,18 @@ const fetchWrapper = async (
     },
   });
 
-  const clonedResponse = response.clone();
-
-  try {
-    const body = await clonedResponse.json();
-    if (body?.errors) {
-      throw {
-        message: body.errors
-          .map((err: APIResponseFormattedError) => err.message)
-          .join(" "),
-        statusCode: body.errors[0]?.extensions?.code || 500,
-      } as ResponseError;
-    }
-  } catch (error) {
-    console.log(error);
-    // Ignore JSON parse errors for non-JSON responses
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    return {
+      success: false,
+      error: data || {
+        message: "Something went wrong",
+        statusCode: response.status,
+      },
+    };
   }
 
-  return response;
+  return { success: true, data };
 };
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -104,34 +99,35 @@ export const customDataProvider: DataProvider = {
     });
 
     const queryStr = queryString.stringify(query);
-    const data = await fetchWrapper(`${url}?${queryStr}`, {
-      method: "GET",
-    }).then((res) => res.json());
+    const res = await fetchWrapper(`${url}?${queryStr}`, { method: "GET" });
+    if (!res.success) throw res.error;
 
-    return { data, total: data.length };
+    return { data: res.data, total: res.data.length };
   },
 
   getOne: async <TData extends BaseRecord>({
     resource,
     id,
   }: any): Promise<GetOneResponse<TData>> => {
-    const url = `${API_URL}/${resource}/${id}`;
-    const data = await fetchWrapper(url, { method: "GET" }).then((res) =>
-      res.json()
-    );
-    return data;
+    const res = await fetchWrapper(`${API_URL}/${resource}/${id}`, {
+      method: "GET",
+    });
+    if (!res.success) throw res.error;
+
+    return { data: res.data };
   },
 
   create: async <TData extends BaseRecord>({
     resource,
     variables,
   }: any): Promise<CreateResponse<TData>> => {
-    const url = `${API_URL}/${resource}`;
-    const data = await fetchWrapper(url, {
+    const res = await fetchWrapper(`${API_URL}/${resource}`, {
       method: "POST",
       body: JSON.stringify(variables),
-    }).then((res) => res.json());
-    return data;
+    });
+    if (!res.success) throw res.error;
+
+    return { data: res.data };
   },
 
   update: async <TData extends BaseRecord>({
@@ -139,70 +135,92 @@ export const customDataProvider: DataProvider = {
     id,
     variables,
   }: any): Promise<UpdateResponse<TData>> => {
-    const url = `${API_URL}/${resource}/${id}`;
-    const data = await fetchWrapper(url, {
+    const res = await fetchWrapper(`${API_URL}/${resource}/${id}`, {
       method: "PATCH",
       body: JSON.stringify(variables),
-    }).then((res) => res.json());
-    return data;
+    });
+    if (!res.success) throw res.error;
+
+    return { data: res.data };
   },
 
   deleteOne: async <TData extends BaseRecord>({
     resource,
     id,
   }: any): Promise<DeleteOneResponse<TData>> => {
-    const url = `${API_URL}/${resource}/${id}`;
-    const { data } = await fetchWrapper(url, { method: "DELETE" }).then((res) =>
-      res.json()
-    );
-    return { data };
+    const res = await fetchWrapper(`${API_URL}/${resource}/${id}`, {
+      method: "DELETE",
+    });
+    if (!res.success) throw res.error;
+
+    return { data: res.data };
   },
 
   getApiUrl: (): string => API_URL,
 
   getMany: async ({ resource, ids }) => {
-    const data = await Promise.all(
+    const results = await Promise.all(
       ids.map((id) =>
-        fetchWrapper(`${API_URL}/${resource}/${id}`, { method: "GET" }).then(
-          (res) => res.json()
-        )
+        fetchWrapper(`${API_URL}/${resource}/${id}`, { method: "GET" })
       )
     );
+
+    const data = results.map((res) => {
+      if (!res.success) throw res.error;
+      return res.data;
+    });
+
     return { data };
   },
 
   createMany: async ({ resource, variables }) => {
-    const data = await Promise.all(
+    const results = await Promise.all(
       variables.map((variable) =>
         fetchWrapper(`${API_URL}/${resource}`, {
           method: "POST",
           body: JSON.stringify(variable),
-        }).then((res) => res.json())
+        })
       )
     );
+
+    const data = results.map((res) => {
+      if (!res.success) throw res.error;
+      return res.data;
+    });
+
     return { data };
   },
 
   deleteMany: async ({ resource, ids }) => {
-    const data = await Promise.all(
+    const results = await Promise.all(
       ids.map((id) =>
-        fetchWrapper(`${API_URL}/${resource}/${id}`, { method: "DELETE" }).then(
-          (res) => res.json()
-        )
+        fetchWrapper(`${API_URL}/${resource}/${id}`, { method: "DELETE" })
       )
     );
+
+    const data = results.map((res) => {
+      if (!res.success) throw res.error;
+      return res.data;
+    });
+
     return { data };
   },
 
   updateMany: async ({ resource, ids, variables }) => {
-    const data = await Promise.all(
+    const results = await Promise.all(
       ids.map((id) =>
         fetchWrapper(`${API_URL}/${resource}/${id}`, {
           method: "PUT",
           body: JSON.stringify(variables),
-        }).then((res) => res.json())
+        })
       )
     );
+
+    const data = results.map((res) => {
+      if (!res.success) throw res.error;
+      return res.data;
+    });
+
     return { data };
   },
 
@@ -219,11 +237,14 @@ export const customDataProvider: DataProvider = {
     if (query) {
       requestUrl = `${requestUrl}?${queryString.stringify(query)}`;
     }
-    const { data } = await fetchWrapper(requestUrl, {
+
+    const res = await fetchWrapper(requestUrl, {
       method,
       headers,
       body: JSON.stringify(payload),
-    }).then((res) => res.json());
-    return { data };
+    });
+    if (!res.success) throw res.error;
+
+    return { data: res.data };
   },
 };

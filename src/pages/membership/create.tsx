@@ -27,6 +27,7 @@ import { useForm as useRefineForm } from "@refinedev/antd";
 import { customDataProvider } from "../../providers/customDataProvider";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for redirection
 import { useDocumentTitle } from "@refinedev/react-router";
+import { useNotification } from "@refinedev/core";
 
 // Utility for combining class names
 const cn = (...classes: string[]): string => classes.filter(Boolean).join(" ");
@@ -54,6 +55,7 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
   const navigate = useNavigate(); // Initialize navigation function
   const [currentStep, setCurrentStep] = useState(1);
   useDocumentTitle("New Membership | CIPMN CRM");
+  const { open: notify } = useNotification();
   const [formData, setFormData] = useState({
     userId: "",
     passport: "",
@@ -147,18 +149,18 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
         name: formData.name, // Use the provided name from the form
         email: formData.email, // Use the provided email from the form
         password: "password123", // Default password
+        confirmPassword: "password123",
       };
 
-      const userResponse: any = await customDataProvider.create({
+      const { data }: any = await customDataProvider.create({
         resource: "auth/register", // API resource name for creating users
         variables: userPayload, // Ensure correct payload format
       });
-
-      if (!userResponse?.id) {
+      if (!data.data?.id) {
         throw new Error("User creation failed: Missing userId");
       }
 
-      const userId = userResponse.id; // Extract userId from response
+      const userId = data.data.id; // Extract userId from response
 
       // Step 2: Create Membership with the userId
       const membershipPayload = {
@@ -189,9 +191,12 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
 
       navigate("/membership"); // Redirect using React Router
       // OR: window.location.href = "/membership"; // Alternative method
-    } catch (error) {
-      console.error("Submission Failed:", error);
-
+    } catch (error: any) {
+      notify?.({
+        type: "error",
+        message: error?.message,
+        description: error?.error || "Something went wrong.",
+      });
       // Show error message from API response if available
       // message.error(error?.message || "Submission failed. Please try again.");
     }
@@ -215,6 +220,203 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
     "South East",
     "South South",
     "South West",
+  ];
+  const countryList = [
+    "Afghanistan",
+    "Albania",
+    "Algeria",
+    "Andorra",
+    "Angola",
+    "Antigua and Barbuda",
+    "Argentina",
+    "Armenia",
+    "Australia",
+    "Austria",
+    "Azerbaijan",
+    "Bahamas",
+    "Bahrain",
+    "Bangladesh",
+    "Barbados",
+    "Belarus",
+    "Belgium",
+    "Belize",
+    "Benin",
+    "Bhutan",
+    "Bolivia",
+    "Bosnia and Herzegovina",
+    "Botswana",
+    "Brazil",
+    "Brunei",
+    "Bulgaria",
+    "Burkina Faso",
+    "Burundi",
+    "Cabo Verde",
+    "Cambodia",
+    "Cameroon",
+    "Canada",
+    "Central African Republic",
+    "Chad",
+    "Chile",
+    "China",
+    "Colombia",
+    "Comoros",
+    "Congo (Congo-Brazzaville)",
+    "Costa Rica",
+    "Croatia",
+    "Cuba",
+    "Cyprus",
+    "Czechia",
+    "Democratic Republic of the Congo",
+    "Denmark",
+    "Djibouti",
+    "Dominica",
+    "Dominican Republic",
+    "Ecuador",
+    "Egypt",
+    "El Salvador",
+    "Equatorial Guinea",
+    "Eritrea",
+    "Estonia",
+    "Eswatini (Swaziland)",
+    "Ethiopia",
+    "Fiji",
+    "Finland",
+    "France",
+    "Gabon",
+    "Gambia",
+    "Georgia",
+    "Germany",
+    "Ghana",
+    "Greece",
+    "Grenada",
+    "Guatemala",
+    "Guinea",
+    "Guinea-Bissau",
+    "Guyana",
+    "Haiti",
+    "Honduras",
+    "Hungary",
+    "Iceland",
+    "India",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Ireland",
+    "Israel",
+    "Italy",
+    "Jamaica",
+    "Japan",
+    "Jordan",
+    "Kazakhstan",
+    "Kenya",
+    "Kiribati",
+    "Kuwait",
+    "Kyrgyzstan",
+    "Laos",
+    "Latvia",
+    "Lebanon",
+    "Lesotho",
+    "Liberia",
+    "Libya",
+    "Liechtenstein",
+    "Lithuania",
+    "Luxembourg",
+    "Madagascar",
+    "Malawi",
+    "Malaysia",
+    "Maldives",
+    "Mali",
+    "Malta",
+    "Marshall Islands",
+    "Mauritania",
+    "Mauritius",
+    "Mexico",
+    "Micronesia",
+    "Moldova",
+    "Monaco",
+    "Mongolia",
+    "Montenegro",
+    "Morocco",
+    "Mozambique",
+    "Myanmar (Burma)",
+    "Namibia",
+    "Nauru",
+    "Nepal",
+    "Netherlands",
+    "New Zealand",
+    "Nicaragua",
+    "Niger",
+    "Nigeria",
+    "North Korea",
+    "North Macedonia",
+    "Norway",
+    "Oman",
+    "Pakistan",
+    "Palau",
+    "Palestine",
+    "Panama",
+    "Papua New Guinea",
+    "Paraguay",
+    "Peru",
+    "Philippines",
+    "Poland",
+    "Portugal",
+    "Qatar",
+    "Romania",
+    "Russia",
+    "Rwanda",
+    "Saint Kitts & Nevis",
+    "Saint Lucia",
+    "Saint Vincent & Grenadines",
+    "Samoa",
+    "San Marino",
+    "Sao Tome & Principe",
+    "Saudi Arabia",
+    "Senegal",
+    "Serbia",
+    "Seychelles",
+    "Sierra Leone",
+    "Singapore",
+    "Slovakia",
+    "Slovenia",
+    "Solomon Islands",
+    "Somalia",
+    "South Africa",
+    "South Korea",
+    "South Sudan",
+    "Spain",
+    "Sri Lanka",
+    "Sudan",
+    "Suriname",
+    "Sweden",
+    "Switzerland",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Tanzania",
+    "Thailand",
+    "Timor-Leste",
+    "Togo",
+    "Tonga",
+    "Trinidad & Tobago",
+    "Tunisia",
+    "Turkey",
+    "Turkmenistan",
+    "Tuvalu",
+    "Uganda",
+    "Ukraine",
+    "United Arab Emirates",
+    "United Kingdom",
+    "United States",
+    "Uruguay",
+    "Uzbekistan",
+    "Vanuatu",
+    "Vatican City",
+    "Venezuela",
+    "Vietnam",
+    "Yemen",
+    "Zambia",
+    "Zimbabwe",
   ];
   const operationalSectors = ["Public", "Private", "Others"];
   const highestEducations = ["PhD", "MSc", "BSc", "HND", "OND"];
@@ -1307,7 +1509,15 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
               label="Country of Origin"
               // rules={[{ required: true, message: "Please enter Country" }]}
             >
-              <Input style={inputStyle} />
+              <Select
+                options={nigeriaStates.map((state) => ({
+                  value: state,
+                  label: state,
+                }))}
+                onChange={handleStateChange}
+                className="w-full"
+                style={inputStyle}
+              />
             </Form.Item>
             <Form.Item
               name={["countryOfOrigin", "geopoliticalZone"]}
@@ -1363,7 +1573,15 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
               label="Country of Residence"
               //rules={[{ required: true, message: "Please enter Country" }]}
             >
-              <Input style={inputStyle} />
+              <Select
+                options={nigeriaStates.map((state) => ({
+                  value: state,
+                  label: state,
+                }))}
+                onChange={handleStateChange}
+                className="w-full"
+                style={inputStyle}
+              />
             </Form.Item>
             <Form.Item
               name={["countryOfResidence", "geopoliticalZone"]}
@@ -1428,7 +1646,15 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
               label="Country of Operation"
               //rules={[{ required: true, message: "Please enter Country" }]}
             >
-              <Input style={inputStyle} />
+              <Select
+                options={nigeriaStates.map((state) => ({
+                  value: state,
+                  label: state,
+                }))}
+                onChange={handleStateChange}
+                className="w-full"
+                style={inputStyle}
+              />
             </Form.Item>
             <Form.Item
               name={["countryOfOperation", "geopoliticalZone"]}
