@@ -430,7 +430,25 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
     "Zimbabwe",
   ];
   const operationalSectors = ["Public", "Private", "Others"];
-  const highestEducations = ["PhD", "MSc", "BSc", "HND", "OND"];
+  const highestEducations = [
+    "B.Ed. (Bachelor of Education)",
+    "B.Eng. (Bachelor of Engineering)",
+    "B.Tech. (Bachelor of Technology)",
+    "LL.B. (Bachelor of Laws)",
+    "B.Pharm. (Bachelor of Pharmacy)",
+    "BMLS (Bachelor of Medical Laboratory Science)",
+    "B.NSc. (Bachelor of Nursing Science)",
+    "B.Agric. (Bachelor of Agriculture)",
+    "B.Arch. (Bachelor of Architecture)",
+    "B.D. (Bachelor of Divinity)",
+    "M.Ed. (Master of Education)",
+    "MBA (Master of Business Administration)",
+    "LL.M. (Master of Laws)",
+    "M.Eng. (Master of Engineering)",
+    "M.Tech. (Master of Technology)",
+    "DBA (Doctor of Business Administration)",
+  ];
+
   const nigeriaStates = [
     "Abia",
     "Adamawa",
