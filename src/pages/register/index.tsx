@@ -22,7 +22,7 @@ export const Register: React.FC = () => {
       ...values,
       userType: "staff",
     };
-
+    console.log("kdskksdkjkjd", finalValues);
     register(finalValues);
   };
 
