@@ -1783,12 +1783,12 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
                       <Form.Item
                         {...restField}
                         name={[name, "year"]}
-                        label="Year of Graduation"
-                        //rules={[{required: true,message: "Please enter graduation year",}]}
+                        label="Month & Year of Graduation"
+                        //rules={[{required: true, message: "Please enter graduation month and year"}]}
                       >
                         <DatePicker
-                          picker="year"
-                          format="YYYY"
+                          picker="month"
+                          format="MMMM YYYY"
                           className="w-full"
                           style={inputStyle}
                         />
