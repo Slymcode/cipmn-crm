@@ -1420,8 +1420,14 @@ export const EditMembership: React.FC<StepFormProps> = () => {
               label="Year of License"
               //rules={[{ required: true, message: "Please enter Year" }]}
             >
-              <Input type="number" style={inputStyle} />
+              <DatePicker
+                picker="month"
+                format="MM/YYYY"
+                className="w-full"
+                style={inputStyle}
+              />
             </Form.Item>
+
             <Form.Item name="stampIDNumber" label="Stamp ID Number">
               <Input style={inputStyle} />
             </Form.Item>
@@ -1730,12 +1736,12 @@ export const EditMembership: React.FC<StepFormProps> = () => {
                       <Form.Item
                         {...restField}
                         name={[name, "year"]}
-                        label="Month & Year of Graduation"
-                        //rules={[{required: true, message: "Please enter graduation month and year"}]}
+                        label="Year of Graduation"
+                        //rules={[{required: true,message: "Please enter graduation year",}]}
                       >
                         <DatePicker
-                          picker="month"
-                          format="MMMM YYYY"
+                          picker="year"
+                          format="YYYY"
                           className="w-full"
                           style={inputStyle}
                         />

@@ -10,6 +10,7 @@ interface RegisterForm {
   email: string;
   password: string;
   confirmPassword: string;
+  userType: string;
 }
 
 export const Register: React.FC = () => {
@@ -17,7 +18,12 @@ export const Register: React.FC = () => {
   useDocumentTitle("Register | CIPMN CRM");
   const { open: notify } = useNotification();
   const onFinish = async (values: RegisterForm) => {
-    register(values);
+    const finalValues: RegisterForm = {
+      ...values,
+      userType: "staff",
+    };
+
+    register(finalValues);
   };
 
   return (
