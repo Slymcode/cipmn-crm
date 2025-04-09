@@ -388,6 +388,8 @@ export const EditMembership: React.FC<StepFormProps> = () => {
   ];
   const operationalSectors = ["Public", "Private", "Others"];
   const highestEducations = [
+    "HND",
+    "BSc",
     "B.Ed. (Bachelor of Education)",
     "B.Eng. (Bachelor of Engineering)",
     "B.Tech. (Bachelor of Technology)",
