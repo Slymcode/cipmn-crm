@@ -57,12 +57,19 @@ export const authProvider: AuthProvider = {
     email,
     password,
     confirmPassword,
+    userType
   }): Promise<AuthActionResponse> => {
     try {
       const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, confirmPassword }),
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          confirmPassword,
+          userType,
+        }),
       });
       if (!response.ok) {
         const errorData = await response.json();
