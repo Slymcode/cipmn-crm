@@ -158,24 +158,35 @@ export const List = () => {
   //  Handle Delete
   const handleDelete = async (id: string) => {
     try {
+      // Find membership record based on ID
+      const membershipRecord = data.find((item) => item.id === id);
+      if (!membershipRecord) {
+        throw new Error("Membership not found in local data.");
+      }
+      const userId = membershipRecord.userId;
+
+      // Delete membership first
       const membershipDeleteResult = await customDataProvider.deleteOne({
         resource: "membership",
         id,
       });
 
-      // delete user info
-      const userId = data[0].userId;
-      if (membershipDeleteResult.data.success) {
+      if (membershipDeleteResult?.data?.success) {
+        // Then delete user
         await customDataProvider.deleteOne({
           resource: "users",
           id: userId,
         });
+
+        // Only update UI if both deletions succeed
         message.success("Membership record deleted successfully!");
+        setData((prevData) => prevData.filter((item) => item.id !== id));
+      } else {
+        throw new Error("Membership deletion failed.");
       }
-      setData((prevData) => prevData.filter((item) => item.id !== id));
-    } catch (error) {
-      console.error("Error deleting membership:", error);
-      message.error("Failed to delete record.");
+    } catch (error: any) {
+      console.error("Error deleting membership or user:", error);
+      message.error(error?.message || "Failed to delete record.");
     }
   };
 
