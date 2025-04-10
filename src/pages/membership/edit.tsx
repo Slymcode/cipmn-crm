@@ -386,10 +386,17 @@ export const EditMembership: React.FC<StepFormProps> = () => {
     "South South",
     "South West",
   ];
-  const operationalSectors = ["Public", "Private", "Others"];
+  const operationalSectors = [
+    "Public",
+    "Private",
+    "NGO and International",
+    "Others",
+  ];
   const highestEducations = [
     "HND",
     "BSc",
+    "PGD",
+    "M.Sc. (Master of Science)",
     "B.Ed. (Bachelor of Education)",
     "B.Eng. (Bachelor of Engineering)",
     "B.Tech. (Bachelor of Technology)",
@@ -406,6 +413,7 @@ export const EditMembership: React.FC<StepFormProps> = () => {
     "M.Eng. (Master of Engineering)",
     "M.Tech. (Master of Technology)",
     "DBA (Doctor of Business Administration)",
+    "Ph.D (Doctor of Philosophy)",
   ];
 
   const nigeriaStates = [
@@ -1272,8 +1280,8 @@ export const EditMembership: React.FC<StepFormProps> = () => {
       "Bwari",
       "Gwagwalada",
       "Kuje",
-      "Municipal Area Council",
-      "Abuja",
+      "Abuja Municipal Area Council (AMAC)",
+      "Kwali",
     ],
   };
 

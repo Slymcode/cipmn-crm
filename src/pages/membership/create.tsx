@@ -146,22 +146,23 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
 
       // Step 1: Create User
       const userPayload = {
-        name: formData.name, // Use the provided name from the form
-        email: formData.email, // Use the provided email from the form
-        password: "password123", // Default password
+        name: formData.name,
+        email: formData.email,
+        password: "password123",
         confirmPassword: "password123",
         userType: "member",
       };
 
       const { data }: any = await customDataProvider.create({
-        resource: "auth/register", // API resource name for creating users
-        variables: userPayload, // Ensure correct payload format
+        resource: "auth/register",
+        variables: userPayload,
       });
+
       if (!data.data?.id) {
         throw new Error("User creation failed: Missing userId");
       }
 
-      const userId = data.data.id; // Extract userId from response
+      const userId = data.data.id;
 
       // Step 2: Create Membership with the userId
       const membershipPayload = {
@@ -179,27 +180,33 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
         references: JSON.stringify(formData.references) || "[]",
       };
 
-      const membershipResponse = await customDataProvider.create({
-        resource: "membership", // API resource name for membership
-        variables: membershipPayload, // Ensure correct payload format
-      });
+      try {
+        await customDataProvider.create({
+          resource: "membership",
+          variables: membershipPayload,
+        });
+      } catch (membershipError: any) {
+        // Rollback user creation
+        await customDataProvider.deleteOne({
+          resource: "users",
+          id: userId,
+        });
 
-      // Success feedback
-      // message.success("Membership application submitted successfully!");
+        throw new Error(
+          membershipError?.message ||
+            "Membership creation failed. User creation has been rolled back."
+        );
+      }
 
-      // Reset form (optional)
+      // If both succeed, reset form and navigate
       form.resetFields();
-
-      navigate("/membership"); // Redirect using React Router
-      // OR: window.location.href = "/membership"; // Alternative method
+      navigate("/membership");
     } catch (error: any) {
       notify?.({
         type: "error",
         message: error?.message,
         description: error?.error || "Something went wrong.",
       });
-      // Show error message from API response if available
-      // message.error(error?.message || "Submission failed. Please try again.");
     }
   };
 
@@ -430,10 +437,17 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
     "Zambia",
     "Zimbabwe",
   ];
-  const operationalSectors = ["Public", "Private", "Others"];
+  const operationalSectors = [
+    "Public",
+    "Private",
+    "NGO and International",
+    "Others",
+  ];
   const highestEducations = [
     "HND",
     "BSc",
+    "PGD",
+    "M.Sc. (Master of Science)",
     "B.Ed. (Bachelor of Education)",
     "B.Eng. (Bachelor of Engineering)",
     "B.Tech. (Bachelor of Technology)",
@@ -450,6 +464,7 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
     "M.Eng. (Master of Engineering)",
     "M.Tech. (Master of Technology)",
     "DBA (Doctor of Business Administration)",
+    "Ph.D (Doctor of Philosophy)",
   ];
 
   const nigeriaStates = [
@@ -1316,8 +1331,8 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
       "Bwari",
       "Gwagwalada",
       "Kuje",
-      "Municipal Area Council",
-      "Abuja",
+      "Abuja Municipal Area Council (AMAC)",
+      "Kwali",
     ],
   };
 
