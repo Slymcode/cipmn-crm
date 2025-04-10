@@ -158,17 +158,20 @@ export const List = () => {
   //  Handle Delete
   const handleDelete = async (id: string) => {
     try {
-      await customDataProvider.deleteOne({
+      const membershipDeleteResult = await customDataProvider.deleteOne({
         resource: "membership",
         id,
       });
+
       // delete user info
       const userId = data[0].userId;
-      await customDataProvider.deleteOne({
-        resource: "users",
-        id: userId,
-      });
-      message.success("Membership record deleted successfully!");
+      if (membershipDeleteResult.data.success) {
+        await customDataProvider.deleteOne({
+          resource: "users",
+          id: userId,
+        });
+        message.success("Membership record deleted successfully!");
+      }
       setData((prevData) => prevData.filter((item) => item.id !== id));
     } catch (error) {
       console.error("Error deleting membership:", error);
