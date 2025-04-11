@@ -141,10 +141,8 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
 
   const handleSubmit = async () => {
     try {
-      // Validate form fields
       const values = await form.validateFields();
 
-      // Step 1: Create User
       const userPayload = {
         name: formData.name,
         email: formData.email,
@@ -153,18 +151,47 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
         userType: "member",
       };
 
-      const { data }: any = await customDataProvider.create({
-        resource: "auth/register",
-        variables: userPayload,
-      });
+      let userId: any;
 
-      if (!data.data?.id) {
-        throw new Error("User creation failed: Missing userId");
+      try {
+        // Try to create user
+        const { data: userData }: any = await customDataProvider.create({
+          resource: "auth/register",
+          variables: userPayload,
+        });
+
+        if (!userData.data?.id) {
+          throw new Error("User creation failed: Missing userId");
+        }
+
+        userId = userData.data.id;
+      } catch (error: any) {
+        // Check if it's due to existing user
+        if (error?.message?.includes("Email already registered")) {
+          const confirmContinue = window.confirm(
+            `The email "${formData.email}" account has already been created. Do you want to create a membership for the existing user?`
+          );
+
+          if (!confirmContinue) return;
+
+          // Fetch existing user ID
+          const existingUser = await customDataProvider.getOne({
+            resource: "users/by-email",
+            id: encodeURIComponent(formData.email),
+          });
+
+          if (!existingUser?.data?.id) {
+            throw new Error("Could not find existing user with this email.");
+          }
+
+          userId = existingUser?.data?.id;
+        } else {
+          // Unknown user creation error
+          throw new Error(error?.message || "User creation failed.");
+        }
       }
 
-      const userId = data.data.id;
-
-      // Step 2: Create Membership with the userId
+      // Proceed to create membership
       const membershipPayload = {
         ...formData,
         ...values,
@@ -180,31 +207,17 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
         references: JSON.stringify(formData.references) || "[]",
       };
 
-      try {
-        await customDataProvider.create({
-          resource: "membership",
-          variables: membershipPayload,
-        });
-      } catch (membershipError: any) {
-        // Rollback user creation
-        await customDataProvider.deleteOne({
-          resource: "users",
-          id: userId,
-        });
+      await customDataProvider.create({
+        resource: "membership",
+        variables: membershipPayload,
+      });
 
-        throw new Error(
-          membershipError?.message ||
-            "Membership creation failed. User creation has been rolled back."
-        );
-      }
-
-      // If both succeed, reset form and navigate
       form.resetFields();
       navigate("/membership");
     } catch (error: any) {
       notify?.({
         type: "error",
-        message: error?.message,
+        message: error?.message || "Submission failed",
         description: error?.error || "Something went wrong.",
       });
     }
