@@ -131,13 +131,99 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
 
   const handleNext = async () => {
     const values = await form.validateFields();
-    setFormData((prev: any) => ({ ...prev, ...values }));
+
+    const updatedData = { ...formData, ...values };
+    setFormData(updatedData);
+    localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(updatedData)); // Cache
+
     setCurrentStep(currentStep + 1);
   };
 
   const handlePrev = () => {
     setCurrentStep(currentStep - 1);
   };
+
+  const FORM_STORAGE_KEY = "membershipFormData";
+  useEffect(() => {
+    const cachedData = localStorage.getItem(FORM_STORAGE_KEY);
+    if (cachedData) {
+      try {
+        const response = JSON.parse(cachedData);
+
+        setFormData((prev: any) => ({
+          ...prev,
+          ...response,
+          dob: response.dob ? dayjs(response.dob) : "",
+          yearOfLicense: response.yearOfLicense
+            ? dayjs(response.yearOfLicense)
+            : "",
+
+          countryOfOrigin:
+            typeof response.countryOfOrigin === "string"
+              ? JSON.parse(response.countryOfOrigin)
+              : response.countryOfOrigin || {},
+
+          countryOfResidence:
+            typeof response.countryOfResidence === "string"
+              ? JSON.parse(response.countryOfResidence)
+              : response.countryOfResidence || {},
+
+          countryOfOperation:
+            typeof response.countryOfOperation === "string"
+              ? JSON.parse(response.countryOfOperation)
+              : response.countryOfOperation || {},
+
+          educationQualification:
+            typeof response.educationQualification === "string"
+              ? {
+                  degrees: JSON.parse(
+                    response.educationQualification
+                  ).degrees.map((degree: any) => ({
+                    ...degree,
+                    year: degree.year ? dayjs(degree.year) : "",
+                  })),
+                  highestQualification: "",
+                }
+              : {
+                  degrees:
+                    response.educationQualification?.degrees?.map(
+                      (degree: any) => ({
+                        ...degree,
+                        year: degree.year ? dayjs(degree.year) : "",
+                      })
+                    ) || [],
+                  highestQualification:
+                    response.educationQualification?.highestQualification || "",
+                },
+
+          professionalQualification:
+            typeof response.professionalQualification === "string"
+              ? JSON.parse(response.professionalQualification)
+              : response.professionalQualification || [],
+
+          workExperience:
+            typeof response.workExperience === "string"
+              ? JSON.parse(response.workExperience).map((exp: any) => ({
+                  ...exp,
+                  year: exp.year ? dayjs(exp.year) : "",
+                }))
+              : response.workExperience?.map((exp: any) => ({
+                  ...exp,
+                  year: exp.year ? dayjs(exp.year) : "",
+                })) || [],
+
+          references:
+            typeof response.references === "string"
+              ? JSON.parse(response.references)
+              : response.references || [],
+        }));
+
+        form.setFieldsValue(response); // Optional
+      } catch (err) {
+        console.error("Failed to restore form data from cache:", err);
+      }
+    }
+  }, []);
 
   const handleSubmit = async () => {
     try {
@@ -207,11 +293,16 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
         references: JSON.stringify(formData.references) || "[]",
       };
 
-      await customDataProvider.create({
+      const { data: membershipData }: any = await customDataProvider.create({
         resource: "membership",
         variables: membershipPayload,
       });
+      if (!membershipData.data?.id) {
+        throw new Error("Membership creation failed: Missing membership ID.");
+      }
 
+      // Clear localStorage after successful membership creation
+      localStorage.removeItem("membershipFormData");
       form.resetFields();
       navigate("/membership");
     } catch (error: any) {
