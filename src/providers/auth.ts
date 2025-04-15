@@ -5,6 +5,8 @@ import {
   OnErrorResponse,
 } from "@refinedev/core";
 
+import { jwtDecode } from "jwt-decode";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const authProvider: AuthProvider = {
@@ -37,9 +39,25 @@ export const authProvider: AuthProvider = {
 
   check: async (): Promise<CheckResponse> => {
     const token = localStorage.getItem("access_token");
-    return token
-      ? { authenticated: true }
-      : { authenticated: false, redirectTo: "/login" };
+
+    if (!token) {
+      return { authenticated: false, redirectTo: "/login" };
+    }
+
+    try {
+      const decoded: { exp: number } = jwtDecode(token);
+      const isExpired = decoded.exp * 1000 < Date.now();
+
+      if (isExpired) {
+        localStorage.removeItem("access_token");
+        return { authenticated: false, redirectTo: "/login" };
+      }
+
+      return { authenticated: true };
+    } catch (error) {
+      localStorage.removeItem("access_token");
+      return { authenticated: false, redirectTo: "/login" };
+    }
   },
 
   logout: async (): Promise<AuthActionResponse> => {
@@ -57,7 +75,7 @@ export const authProvider: AuthProvider = {
     email,
     password,
     confirmPassword,
-    userType
+    userType,
   }): Promise<AuthActionResponse> => {
     try {
       const response = await fetch(`${API_URL}/auth/register`, {
