@@ -547,6 +547,39 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
     "NGO and International",
     "Others",
   ];
+
+  const specialization = [
+    "IT Project Manager",
+    "Construction Project Manager",
+    "Engineering Project Manager",
+    "Healthcare Project Manager",
+    "Marketing Project Manager",
+    "Finance Project Manager",
+    "Manufacturing Project Manager",
+    "Telecom Project Manager",
+    "Oil & Gas Project Manager",
+    "Pharmaceutical Project Manager",
+    "Education Project Manager",
+    "Event Project Manager",
+    "Environmental Project Manager",
+    "NGO/Development Project Manager",
+    "Agile Project Manager",
+    "Waterfall Project Manager",
+    "Hybrid Project Manager",
+    "Technical Project Manager",
+    "Digital Project Manager",
+    "Enterprise Project Manager",
+    "PMO Project Manager",
+    "Freelance/Contract Project Manager",
+    "PMP Project Manager",
+    "CAPM Project Manager",
+    "PRINCE2 Project Manager",
+    "SAFe Agile Project Manager",
+    "Certified Scrum Master",
+    "Lean Six Sigma Project Manager",
+    "Change Management Project Manager",
+  ];
+
   const highestEducations = [
     "HND",
     "BSc",
@@ -2111,13 +2144,10 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
               //rules={[{ required: true, message: "Please select Specialization" }]}
             >
               <Select
-                options={[
-                  { value: "IT Project Manager", label: "IT Project Manager" },
-                  {
-                    value: "Construction Project Manager",
-                    label: "Construction Project Manager",
-                  },
-                ]}
+                options={specialization.map((spec) => ({
+                  value: spec,
+                  label: spec,
+                }))}
                 className="w-full"
                 style={inputStyle}
               />
