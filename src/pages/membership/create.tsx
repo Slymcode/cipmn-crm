@@ -98,6 +98,7 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
         {
           name: "",
           institution: "",
+          course: "",
           year: null,
         },
       ],
@@ -585,6 +586,7 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
     "BSc",
     "PGD",
     "M.Sc. (Master of Science)",
+    "MA. (Master of Arts)",
     "B.Ed. (Bachelor of Education)",
     "B.Eng. (Bachelor of Engineering)",
     "B.Tech. (Bachelor of Technology)",
@@ -1938,7 +1940,15 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
                       >
                         <Input style={inputStyle} />
                       </Form.Item>
-
+                      {/* Course of study */}
+                      <Form.Item
+                        {...restField}
+                        name={[name, "course"]}
+                        label="Course of Study"
+                        //rules={[{required: true,message: "Please enter course of study",}]}
+                      >
+                        <Input style={inputStyle} />
+                      </Form.Item>
                       {/* Year of Graduation */}
                       <Form.Item
                         {...restField}
