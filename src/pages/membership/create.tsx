@@ -585,6 +585,7 @@ export const CreateMembership: React.FC<StepFormProps> = () => {
     "HND",
     "BSc",
     "PGD",
+    "Ph.D",
     "M.Sc. (Master of Science)",
     "MA. (Master of Arts)",
     "B.Ed. (Bachelor of Education)",
