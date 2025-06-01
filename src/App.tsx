@@ -23,6 +23,7 @@ import {
   EditMembership,
   List as MyList,
 } from "./pages/membership";
+import MembersProfile from "./pages/profile";
 
 function App() {
   return (
@@ -62,6 +63,7 @@ function App() {
                   </Authenticated>
                 }
               >
+                <Route path="/profile" element={<MembersProfile />} />
                 <Route element={<HomeLayout />}>
                   <Route index element={<Home />} />
                   <Route path="/membership" element={<MyList />} />

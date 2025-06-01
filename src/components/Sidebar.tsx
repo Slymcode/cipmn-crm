@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Layout, Menu } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { DashboardOutlined, LogoutOutlined } from "@ant-design/icons";
@@ -16,10 +16,55 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
     // Clear authentication data
     localStorage.removeItem("access_token"); // Remove stored token (modify as needed)
     sessionStorage.removeItem("user"); // Remove session data if used
+    localStorage.removeItem("GUSER"); // Remove guest user data if used
 
     // Redirect to login page
     navigate("/login?logged_out=true");
   };
+
+  console.log(
+    "Sidebar rendered with collapsed state:",
+    localStorage.getItem("GUSER")
+  );
+  const guser = localStorage.getItem("GUSER");
+  const menuItems = [
+    {
+      key: "dashboard",
+      icon: <DashboardOutlined style={{ color: "white" }} />,
+      label: (
+        <Link to="/" style={{ color: "white" }}>
+          Dashboard
+        </Link>
+      ),
+    },
+    // Only add this if GUSER is NOT found
+    ...(!guser
+      ? [
+          {
+            key: "membership",
+            icon: <DashboardOutlined style={{ color: "white" }} />,
+            label: (
+              <Link to="/membership" style={{ color: "white" }}>
+                Membership
+              </Link>
+            ),
+          },
+        ]
+      : []),
+    {
+      key: "logout",
+      icon: <LogoutOutlined style={{ color: "white" }} />,
+      label: <span style={{ color: "white" }}>Logout</span>,
+      onClick: handleLogout,
+    },
+  ];
+
+  // use useEffect and redirect user to profile if localStorage.getItem("GUSER")
+  useEffect(() => {
+    if (guser) {
+      navigate("/profile");
+    }
+  }, [guser, navigate]);
 
   return (
     <div className="fixed left-0 top-0 h-screen text-white z-50">
@@ -54,32 +99,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
             defaultSelectedKeys={["dashboard"]}
             theme="dark"
             style={{ backgroundColor: "#1F5E29", color: "white" }}
-            items={[
-              {
-                key: "dashboard",
-                icon: <DashboardOutlined style={{ color: "white" }} />,
-                label: (
-                  <Link to="/" style={{ color: "white" }}>
-                    Dashboard
-                  </Link>
-                ),
-              },
-              {
-                key: "membership",
-                icon: <DashboardOutlined style={{ color: "white" }} />,
-                label: (
-                  <Link to="/membership" style={{ color: "white" }}>
-                    Membership
-                  </Link>
-                ),
-              },
-              {
-                key: "logout",
-                icon: <LogoutOutlined style={{ color: "white" }} />,
-                label: <span style={{ color: "white" }}>Logout</span>,
-                onClick: handleLogout,
-              },
-            ]}
+            items={menuItems}
           />
         </div>
       </Sider>

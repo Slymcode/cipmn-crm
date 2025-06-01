@@ -28,6 +28,11 @@ export const authProvider: AuthProvider = {
 
       const { data } = await response.json();
       localStorage.setItem("access_token", data.accessToken);
+
+      if (email === "guest@gmail.com") {
+        //set localStorage.setItem("user", JSON.stringify({ name: "Guest User", email: "
+        localStorage.setItem("GUSER", email);
+      }
       return { success: true, redirectTo: "/" };
     } catch (error: any) {
       return Promise.reject({
