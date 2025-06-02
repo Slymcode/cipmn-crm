@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Form, Input, Button } from "antd";
 import { useLogin, useNotification } from "@refinedev/core";
 import { Link, useLocation } from "react-router-dom";
@@ -15,10 +15,19 @@ export const Login: React.FC = () => {
   const location = useLocation();
   const { open } = useNotification();
   const hasShownLogoutToast = useRef(false);
+  const [loading, setLoading] = useState(false); // 🚀 New loading state
   useDocumentTitle("Login | CIPMN CRM");
 
-  const onFinish = (values: LoginForm) => {
-    login(values);
+  const onFinish = async (values: LoginForm) => {
+    setLoading(true); // Start loading
+    login(values, {
+      onSuccess: () => {
+        setLoading(false); // Stop loading on success
+      },
+      onError: () => {
+        setLoading(false); // Stop loading on error
+      },
+    });
   };
 
   useEffect(() => {
@@ -73,25 +82,16 @@ export const Login: React.FC = () => {
           />
         </Form.Item>
 
-        {/* Forgot Password 
-        <div className="text-xs font-medium text-right text-[#1F5E29] mb-6 cursor-pointer hover:underline">
-          <Link
-            to="/forgot-password"
-            className="text-[#1F5E29] font-semibold hover:underline"
-            style={{ color: "#1F5E29" }}
-          >
-            Forgot password?
-          </Link>
-        </div>
-*/}
         {/* Sign In Button */}
         <Button
           type="primary"
           htmlType="submit"
+          loading={loading}
+          disabled={loading}
           className="w-full p-3 text-white font-semibold bg-[#1F5E29] rounded-md transition-all duration-300 hover:bg-[#174a21] hover:shadow-lg"
           style={{ background: "#1F5E29", border: "none" }}
         >
-          Sign in
+          {loading ? "Signing in..." : "Sign in"}
         </Button>
       </Form>
 

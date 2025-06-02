@@ -248,14 +248,23 @@ export const List = () => {
       />
       <div className="flex items-center justify-between gap-2 my-3">
         <h2 className="text-2xl text-[#14401D]">Membership List</h2>
-        <Link
-          to="/membership/create"
-          className="px-2 py-1 text-xs text-white font-semibold bg-[#1F5E29] rounded-md transition-all duration-300 hover:bg-[#174a21] hover:shadow-lg"
-          style={{ background: "#1F5E29", border: "none", color: "#fff" }}
-        >
-          Create Membership
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/profile"
+            className="px-2 py-1 text-xs text-[#1F5E29] font-semibold border border-[#1F5E29] rounded-md transition-all duration-300 hover:bg-[#f3f3f3]"
+          >
+            Profile List
+          </Link>
+          <Link
+            to="/membership/create"
+            className="px-2 py-1 text-xs text-white font-semibold bg-[#1F5E29] rounded-md transition-all duration-300 hover:bg-[#174a21] hover:shadow-lg"
+            style={{ background: "#1F5E29", border: "none", color: "#fff" }}
+          >
+            Create Membership
+          </Link>
+        </div>
       </div>
+
       <Table<MembershipType>
         columns={columns}
         dataSource={data}
