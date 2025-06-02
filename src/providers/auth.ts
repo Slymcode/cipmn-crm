@@ -8,7 +8,7 @@ import {
 import { jwtDecode } from "jwt-decode";
 
 const API_URL = import.meta.env.VITE_API_URL;
-
+let redirectPath = "/";
 export const authProvider: AuthProvider = {
   login: async ({ email, password }): Promise<AuthActionResponse> => {
     try {
@@ -32,8 +32,9 @@ export const authProvider: AuthProvider = {
       if (email === "guest@gmail.com") {
         //set localStorage.setItem("user", JSON.stringify({ name: "Guest User", email: "
         localStorage.setItem("GUSER", email);
+        redirectPath = "/profile";
       }
-      return { success: true, redirectTo: "/" };
+      return { success: true, redirectTo: redirectPath };
     } catch (error: any) {
       return Promise.reject({
         success: false,
